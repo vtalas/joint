@@ -38,6 +38,7 @@ joint.layout.DirectedGraph = {
             // We are able to layout graphs with embeds.
             compound: true,
             setNodeLabel: function(element) {
+
                 return {
                     width: element.get('size').width,
                     height: element.get('size').height,

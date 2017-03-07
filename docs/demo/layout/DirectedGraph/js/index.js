@@ -1,13 +1,25 @@
 'use strict';
 
-(function() {
+define('joint-graph', ['graphlib', 'dagre'], function(graphlib, dagre) {
+    window.graphlib = graphlib;
+    window.dagre = dagre;
+});
+
+require([
+    'joint',
+    'js/aaa/Orgate',
+    'js/aaa/Andgate',
+    'js/aaa/Finalelement',
+    'js/aaa/FailureMode',
+    'js/aaa/Hypothesis',
+    'joint-graph'], function(joint, o) {
 
     var graph = new joint.dia.Graph;
     var paper = new joint.dia.Paper({
         el: $('#paper'),
-        width: 400,
-        height: 400,
-        gridSize: 1,
+        width: 900,
+        height: 900,
+        gridSize: 5,
         model: graph
     });
 
@@ -15,87 +27,52 @@
 
     function layout() {
 
-        try {
-            var adjacencyList = JSON.parse($('#adjacency-list').val());
-        } catch (error) {
-            console.log(error);
-        }
-
-        var cells = adjacencyListToCells(adjacencyList);
-
-        graph.resetCells(cells);
-
         joint.layout.DirectedGraph.layout(graph, {
-            setLinkVertices: false
+            nodeSep: 120,
+            edgeSep: 100,
+            rankSep: 110,
+            rankDir: "R"
         });
     }
 
-    // Helpers.
-    // --------
 
-    function adjacencyListToCells(adjacencyList) {
-
-        var elements = [];
-        var links = [];
-
-        _.each(adjacencyList, function(edges, parentElementLabel) {
-            elements.push(makeElement(parentElementLabel));
-
-            _.each(edges, function(childElementLabel) {
-                links.push(makeLink(parentElementLabel, childElementLabel));
-            });
-        });
-
-        // Links must be added after all the elements. This is because when the links
-        // are added to the graph, link source/target
-        // elements must be in the graph already.
-        var cells = elements.concat(links);
-
-        return cells;
+    var app = {
+        joint: joint
     }
 
-    function makeLink(parentElementLabel, childElementLabel) {
+    var orCell = new (OrGateFn(app))({
+        position: { x: 10, y: 10 },
+        size: { width: 100, y: 100 }
+    });
 
-        return new joint.dia.Link({
-            source: { id: parentElementLabel },
-            target: { id: childElementLabel },
-            attrs: {
-                '.marker-target': { d: 'M 4 0 L 0 2 L 4 4 z' }
-            },
-            smooth: true
-        });
-    }
+    var andCell = new (AndGateFn(app))({
+        position: { x: 100, y: 100 },
+        size: { width: 100, y: 100 }
+    });
 
-    function makeElement(label) {
+    var hypoCell = new (HypothesisFn(app))({
+        position: { x: 100, y: 200 },
+        size: { width: 100, y: 100 }
+    });
 
-        var maxLineLength = _.max(label.split('\n'), function(l) {
-            return l.length;
-        }).length;
+    var finalCell = new (finalElement(app))({
+        position: { x: 100, y: 400 },
+        size: { width: 100, y: 100 }
+    });
+    var failureCell = new (FailuremodeFn(app))({
+        position: { x: 200, y: 400 },
+        size: { width: 100, y: 100 }
+    });
 
-        // Compute width/height of the rectangle based on the number
-        // of lines in the label and the letter size. 0.6 * letterSize is
-            // an approximation of the monospace font letter width.
-        var letterSize = 10;
-        var width = 2 * (letterSize * (0.6 * maxLineLength + 1));
-        var height = 2 * ((label.split('\n').length + 1) * letterSize);
+    graph.addCell(orCell);
+    graph.addCell(andCell);
+    graph.addCell(hypoCell);
+    graph.addCell(finalCell);
+    graph.addCell(failureCell);
 
-        return new joint.shapes.basic.Rect({
-            id: label,
-            size: { width: width, height: height },
-            attrs: {
-                text: { text: label, 'font-size': letterSize, 'font-family': 'monospace', fill: 'white' },
-                rect: {
-                    fill: '#FE854F',
-                    width: width,
-                    height: height,
-                    rx: 5,
-                    ry: 5,
-                    stroke: 'none'
-                }
-            }
-        });
-    }
-
-    layout();
+    new joint.dia.Link({source: orCell, target: andCell}).addTo(graph);
+    new joint.dia.Link({source: orCell, target: hypoCell}).addTo(graph);
+    new joint.dia.Link({source: hypoCell, target: finalCell}).addTo(graph);
+    new joint.dia.Link({source: hypoCell, target: failureCell}).addTo(graph);
 
 })();
