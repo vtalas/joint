@@ -31,10 +31,11 @@ require([
             nodeSep: 120,
             edgeSep: 100,
             rankSep: 110,
-            rankDir: "R"
+            rankDir: "TB"
         });
     }
 
+    console.log(joint);
 
     var app = {
         joint: joint
