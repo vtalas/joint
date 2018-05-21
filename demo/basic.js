@@ -1,245 +1,181 @@
-
-
+"use strict";
 var graph = new joint.dia.Graph;
 
 var paper = new joint.dia.Paper({
     el: $('#paper'),
     width: 650,
-    height: 400,
-    gridSize: 20,
+    height: 1200,
+    gridSize: 10,
     model: graph,
     markAvailable: true,
     linkConnectionPoint: joint.util.shapePerimeterConnectionPoint
 });
 
-var rb = new joint.shapes.basic.Rect({
-    position: { x: 50, y: 50 },
-    size: { width: 100, height: 40 },
-    attrs: { text: { text: 'basic.Rect' } }
-});
-graph.addCell(rb);
+var x = new joint.shapes.devs.Model()
+    .position(100, 200)
+    .size(100, 100)
+    .addTo(graph)
+    .set('inPorts', ['x1', 'x2', 'x3', 'x4']);
 
-var tb = new joint.shapes.basic.Text({
-    position: { x: 170, y: 50 },
-    size: { width: 100, height: 30 },
-    attrs: { text: { text: 'basic.Text' } }
-});
-graph.addCell(tb);
 
-var cb = new joint.shapes.basic.Circle({
-    position: { x: 300, y: 70 },
-    size: { width: 100, height: 40 },
-    attrs: { text: { text: 'basic.Circle' } }
-});
-graph.addCell(cb);
+var y = new joint.shapes.devs.Model()
+    .position(200, 400)
+    .size(100, 100)
+    .addTo(graph)
+    .set('outPorts', ['y1', 'y2', 'y3', 'y4']);
 
-var ib = new joint.shapes.basic.Image({
-    position: { x: 450, y: 50 },
-    size: { width: 40, height: 40 },
-    attrs: {
-        text: { text: 'basic.Image' },
-        image: { 'xlink:href': 'http://placehold.it/48x48', width: 48, height: 48 }
+var yy = new joint.shapes.devs.Model()
+    .position(200, 50)
+    .size(100, 100)
+    .addTo(graph)
+    .set('outPorts', ['yy1', 'yy2', 'yy3', 'yy4']);
+
+var topx = new joint.shapes.devs.Model({
+    ports: {
+        groups: {
+            'in': {
+                position: { name: 'bottom' },
+                label: { position: 'top' }
+            }
+        }
     }
-});
-graph.addCell(ib);
+})
+    .position(100, 600)
+    .size(100, 100)
+    .addTo(graph)
+    .set('inPorts', ['11', '12', '13', '14'])
+    .set('outPorts', ['11a', '12a', '13a', '14a']);
 
-var pb = new joint.shapes.basic.Path({
-    position: { x: 50, y: 150 },
-    size: { width: 40, height: 40 },
+var bottom = new joint.shapes.devs.Model({
     attrs: {
-        path: { d: 'M25.979,12.896 19.312,12.896 19.312,6.229 12.647,6.229 12.647,12.896 5.979,12.896 5.979,19.562 12.647,19.562 12.647,26.229 19.312,26.229 19.312,19.562 25.979,19.562z' },
-        text: { text: 'basic.Path' }
+        text: { text: '' }
+    },
+    ports: {
+        groups: {
+            'in': {
+                position: { name: 'top', args: { start: { x: 20, y: 0}, end: { x: 230, y: 0 } } },
+                label: { position: 'bottom' }
+            }
+        }
     }
-});
-graph.addCell(pb);
-
-var rh = new joint.shapes.basic.Rhombus({
-    position: { x: 50, y: 250 },
-    size: { width: 70, height: 70 },
-    attrs: { text: { text: 'basic.Rhombus', 'font-size': 8 } }
-});
-graph.addCell(rh);
-
-var tbl = new joint.shapes.basic.TextBlock({
-    position: { x: 400, y: 150 },
-    size: { width: 180, height: 100 },
-    content: "Lorem ipsum dolor sit amet,\n consectetur adipiscing elit. Nulla vel porttitor est."
-});
-graph.addCell(tbl);
-
-// An example of a custom element.
-// -------------------------------
-
-var MyElementWithPorts = joint.shapes.basic.Generic.extend({
-
-   defaults: _.defaultsDeep({
-
-       markup: [
-           '<g class="rotatable">',
-           '<g class="scalable">',
-           '<rect/>',
-           '</g>',
-           '<g class="inPorts">',
-           '<g class="port1"><circle/><text/></g>',
-           '<g class="port2"><circle/><text/></g>',
-           '</g>',
-           '<g class="outPorts">',
-           '<g class="port3"><circle/><text/></g>',
-           '<g class="port4"><circle/><text/></g>',
-           '</g>',
-           '</g>'
-       ].join(''),
-
-       type: 'basic.Generic',
-       attrs: {
-           '.': { magnet: false },
-           rect: {
-               width: 150, height: 250,
-               stroke: 'black'
-           },
-           circle: {
-               r: 5,
-               magnet: true,
-               stroke: 'black'
-           },
-           text: {
-               fill: 'black',
-               'pointer-events': 'none'
-           },
-           '.label': { text: 'Model', dx: 5, dy: 5 },
-           '.inPorts text': { dx:-15, 'text-anchor': 'end' },
-           '.outPorts text':{ dx: 15 },
-           '.inPorts circle': { fill: 'PaleGreen' },
-           '.outPorts circle': { fill: 'Tomato' }
-       }
-
-   }, joint.shapes.basic.Generic.prototype.defaults)
-});
-
-var d = new MyElementWithPorts({
-    position: { x: 250, y: 150 },
-    size: { width: 80, height: 80 },
-    attrs: {
-        '.port1 text': { text: 'port1' },
-        '.port2 text': { text: 'port2' },
-        '.port3 text': { text: 'port3' },
-        '.port4 text': { text: 'port4' },
-        '.port1': { ref: 'rect', 'ref-y': .2 },
-        '.port2': { ref: 'rect', 'ref-y': .4 },
-        '.port3': { ref: 'rect', 'ref-y': .2, 'ref-dx': 0 },
-        '.port4': { ref: 'rect', 'ref-y': .4, 'ref-dx': 0 }
-    }
-});
-
-graph.addCell(d);
+})
+    .position(400, 800)
+    .size(250, 100)
+    .addTo(graph)
+    .set('inPorts', ['1', '2', '3', '4', '5', '6', '7', '8']);
 
 
-// An example showing auto-resize of the joint.shapes.basic.Rect element based on the size of the text in it:
+function portUtil(element, port) {
 
-rb.on('change:attrs', function(element) {
+    return Object.create({
+        element: element,
+        port: port,
+        // minimum link offset from the element (should be higher than paper grid size)
+        PADDING: 12,
+        // space between parallel links
+        LINK_OFFSET: 20,
+        getPosition: function() {
+            var group = port.group;
+            return this.element.prop('ports/groups/' + group + '/position/name');
+        },
 
-    var text = rb.attr('text/text');
-    var fontSize = parseInt(rb.attr('text/font-size'), 10);
+        getOrderedPortPostions: function(model, groupName) {
+            return model.getPortsPositions(groupName);
+        },
 
-    var svgDocument = V('svg').node;
-    var textElement = V('<text><tspan></tspan></text>').node;
-    var textSpan = textElement.firstChild;
-    var textNode = document.createTextNode('');
+        sss: function(refModel) {
+            var model = this.element;
+            var groupName = port.group;
+            var position = this.getPosition();
+            var elBBox = model.position();
+            var refBBox = refModel.position();
+            var refIsBelow = refBBox.y < elBBox.y;
+            var refIsRight = refBBox.x > elBBox.x;
 
-    textSpan.appendChild(textNode);
-    svgDocument.appendChild(textElement);
-    document.body.appendChild(svgDocument);
+            var portPositions = this.getOrderedPortPostions(model, groupName);
+            var portPosition = portPositions[port.id];
+            var vertexPosition = null;
+            var portsTotal = Object.keys(portPositions).length - 1;
 
-    var lines = text.split('\n');
-    var width = 0;
+            var offset;
+            if (position === 'left') {
+                if (refIsBelow) {
+                    offset = (portPosition.index) * this.LINK_OFFSET + this.PADDING
+                } else {
+                    offset = (portsTotal - portPosition.index) * this.LINK_OFFSET + this.PADDING;
+                }
+                vertexPosition = { x: elBBox.x + portPosition.x - offset, y: elBBox.y + portPosition.y };
+            }
 
-    // Find the longest line width.
-    _.each(lines, function(line) {
+            if (position === 'right') {
+                if (refIsBelow) {
+                    offset = (portPosition.index) * this.LINK_OFFSET + this.PADDING;
+                } else {
+                    offset = (portsTotal - portPosition.index) * this.LINK_OFFSET + this.PADDING
+                }
 
-        textNode.data = line;
-        var lineWidth = textSpan.getComputedTextLength();
+                vertexPosition = { x: elBBox.x + portPosition.x + offset, y: elBBox.y + portPosition.y };
+            }
 
-        width = Math.max(width, lineWidth);
+            if (position === 'top') {
+                if (refIsRight) {
+                    offset = (portsTotal - portPosition.index) * this.LINK_OFFSET + this.PADDING;
+                } else {
+                    offset = portPosition.index * this.LINK_OFFSET + this.PADDING
+                }
+                vertexPosition = { x: elBBox.x + portPosition.x, y: elBBox.y - offset + portPosition.y };
+            }
+
+            if (position === 'bottom') {
+                if (refIsRight) {
+                    offset = (portsTotal - portPosition.index) * this.LINK_OFFSET + this.PADDING;
+                } else {
+                    offset = portPosition.index * this.LINK_OFFSET + this.PADDING
+                }
+                vertexPosition = { x: elBBox.x + portPosition.x, y: elBBox.y + offset + portPosition.y };
+            }
+
+            return vertexPosition;
+        }
     });
+}
 
-    var height = lines.length * (fontSize * 1.2);
+paper.on('link:connect', function(cellView) {
 
-    V(svgDocument).remove();
+    var cell = cellView.model;
+    if (cell.isLink()) {
+        var view = cell.findView(paper);
 
-    element.resize(width + 10, height);
-});
+        var source = cell.getSourceElement();
+        var target = cell.getTargetElement();
 
-// Image decorated rectangle shape example.
+        var sourcePort = cell.get('source').port;
+        var vertexPosition;
 
-joint.shapes.basic.DecoratedRect = joint.shapes.basic.Generic.extend({
+        if (sourcePort) {
+            var sourcePorts = portUtil(source, source.getPort(sourcePort));
+            vertexPosition = sourcePorts.sss(target);
+            if (vertexPosition) {
+                view.addVertex(vertexPosition.x, vertexPosition.y);
+            }
 
-    markup: '<g class="rotatable"><g class="scalable"><rect/></g><image/><text/></g>',
-
-    defaults: _.defaultsDeep({
-
-        type: 'basic.DecoratedRect',
-        size: { width: 100, height: 60 },
-        attrs: {
-            'rect': { fill: '#FFFFFF', stroke: 'black', width: 100, height: 60 },
-            'text': { 'font-size': 14, text: '', 'ref-x': .5, 'ref-y': .5, ref: 'rect', 'y-alignment': 'middle', 'x-alignment': 'middle', fill: 'black' },
-            'image': { 'ref-x': 2, 'ref-y': 2, ref: 'rect', width: 16, height: 16 }
         }
 
-    }, joint.shapes.basic.Generic.prototype.defaults)
-});
+        var targetPort = cell.get('target').port;
+        if (targetPort) {
 
-var decoratedRect = new joint.shapes.basic.DecoratedRect({
-    position: { x: 150, y: 80 },
-    size: { width: 100, height: 60 },
-    attrs: {
-        text: { text: 'My Element' },
-        image: { 'xlink:href': 'http://placehold.it/16x16' }
-    }
-});
-graph.addCell(decoratedRect);
-
-
-joint.shapes.basic.Cylinder = joint.shapes.basic.Generic.extend({
-
-    markup: '<g class="rotatable"><g class="scalable"><path/></g><text/></g>',
-
-    defaults: _.defaultsDeep({
-
-        type: 'basic.Cylinder',
-        size: { width: 40, height: 40 },
-        attrs: {
-            'path': {
-                fill: '#FFFFFF', stroke: '#cbd2d7', 'stroke-width': 3,
-                d: [
-                    'M 0 10 C 10 5, 30 5, 40 10 C 30 15, 10 15, 0 10',
-                    'L 0 20',
-                    'C 10 25, 30 25, 40 20',
-                    'L 40 10'
-                ].join(' ')
-            },
-            'text': { fill: '#435460', 'font-size': 14, text: '', 'ref-x': .5, 'ref-y': .7, ref: 'path', 'y-alignment': 'middle', 'text-anchor': 'middle', fill: 'black', 'font-family': 'Arial, helvetica, sans-serif' }
+            var t = portUtil(target, target.getPort(targetPort));
+            vertexPosition = t.sss(source);
+            if (vertexPosition) {
+                view.addVertex(vertexPosition.x, vertexPosition.y);
+            }
         }
 
-    }, joint.shapes.basic.Generic.prototype.defaults)
-});
-
-var cylinder = new joint.shapes.basic.Cylinder({
-
-    position: { x: 200, y: 200 },
-    size: { width: 180, height: 150 },
-    attrs: {
-        text: { text: 'SEQUENCE\nLIBRARY' }
+        cell.set('router', {
+            name: 'manhattan', args: {
+                paddingBox: { x: 0, y: 0, width: 0, height: 0 },
+                startDirections: [sourcePorts.getPosition()], endDirections: [t.getPosition()]
+            }
+        })
     }
 });
-
-graph.addCell(cylinder);
-
-var c = V('circle', { r: 8, fill: 'red' });
-var cylinderView = cylinder.findView(paper);
-var cylinderPath = cylinderView.vel.findOne('path');
-var cylinderScalable = cylinderView.vel.findOne('.scalable');
-var cylinderScalableCTM = cylinderScalable.node.getCTM().inverse();
-
-c.animateAlongPath({ dur: '4s', repeatCount: 'indefinite' }, cylinderPath.node);
-c.scale(cylinderScalableCTM.a, cylinderScalableCTM.d);
-cylinderScalable.append(c);

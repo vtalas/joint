@@ -275,11 +275,12 @@
 
             var portsMetrics = this._portSettingsData.getGroupPortsMetrics(groupName, g.Rect(this.size()));
 
-            return portsMetrics.reduce(function(positions, metrics) {
+            return portsMetrics.reduce(function(positions, metrics, index) {
                 var transformation = metrics.portTransformation;
                 positions[metrics.portId] = {
                     x: transformation.x,
                     y: transformation.y,
+                    index: index,
                     angle: transformation.angle
                 };
                 return positions;
